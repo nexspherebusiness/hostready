@@ -2,3 +2,5 @@ shots/
 *.cjs
 check.jpg
 node_modules/
+print/
+out/
