@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>HostReady: your host setup app</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2216%22 fill=%22%23EF6F53%22/%3E%3Ctext x=%2232%22 y=%2244%22 font-family=%22Arial%22 font-weight=%22700%22 font-size=%2234%22 text-anchor=%22middle%22 fill=%22white%22%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root { --ink:#1E2A3A; --ink2:#3B4A5E; --coral:#EF6F53; --coral-d:#D9573C; --sand:#F6F1EA; --card:#FFFFFF; --line:#E6DED2; --sage:#8DB6A4; --sage-d:#3E7A63; --muted:#6A7586; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 17px; line-height: 1.55; color: var(--ink); background: var(--sand); }
+h1, h2, h3 { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; line-height: 1.15; margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.top { position: sticky; top: 0; z-index: 10; background: var(--ink); color: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: "DM Serif Display", serif; font-size: 22px; }
+.brand i { width: 30px; height: 30px; border-radius: 9px; background: var(--coral); display: grid; place-items: center; font-style: normal; font-family: Inter, sans-serif; font-weight: 700; font-size: 16px; }
+.prop { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.prop select { background: #2C3B50; color: #fff; border: 1px solid #44566F; border-radius: 10px; padding: 8px 10px; max-width: 46vw; }
+.prop button { background: transparent; color: #fff; border: 1px solid #44566F; border-radius: 10px; padding: 8px 12px; cursor: pointer; white-space: nowrap; }
+.layout { display: grid; grid-template-columns: 250px 1fr; min-height: calc(100vh - 56px); }
+nav.side { background: #fff; border-right: 1px solid var(--line); padding: 18px 12px; }
+nav.side p { margin: 14px 10px 6px; font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--muted); }
+nav.side button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 11px 12px; border-radius: 12px; cursor: pointer; font-weight: 600; min-height: 46px; }
+nav.side button:hover { background: var(--sand); }
+nav.side button.on { background: var(--ink); color: #fff; }
+nav.side button span.n { width: 26px; height: 26px; border-radius: 50%; background: var(--sand); display: grid; place-items: center; font-size: 13px; flex: none; color: var(--ink); }
+nav.side button.on span.n { background: var(--coral); color: #fff; }
+main { padding: 26px clamp(16px, 4vw, 48px) 80px; max-width: 980px; width: 100%; }
+.view { display: none; }
+.view.on { display: block; }
+.lead { color: var(--ink2); max-width: 64ch; margin: 8px 0 20px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: 0 8px 24px -18px rgba(30,42,58,.4); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+.full { grid-column: 1 / -1; }
+label { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+label small { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=number], input[type=tel], select, textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 12px; background: #fff; min-height: 48px; }
+textarea { min-height: 96px; resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 3px solid rgba(239,111,83,.35); border-color: var(--coral); }
+fieldset { border: 0; padding: 0; margin: 0 0 22px; }
+legend { font-family: "DM Serif Display", serif; font-size: 24px; margin-bottom: 12px; }
+.checks { display: flex; flex-wrap: wrap; gap: 10px; }
+.checks label { display: flex; align-items: center; gap: 8px; font-weight: 500; background: var(--sand); border-radius: 999px; padding: 8px 14px; margin: 0; cursor: pointer; }
+.checks input { width: 20px; height: 20px; accent-color: var(--coral); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 22px; border-radius: 999px; border: 0; background: var(--coral); color: #fff; font-weight: 700; cursor: pointer; text-decoration: none; }
+.btn:hover { background: var(--coral-d); }
+.btn.ghost { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
+.btn.small { min-height: 40px; padding: 0 16px; font-size: 15px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
+.saved { color: var(--sage-d); font-weight: 600; font-size: 15px; }
+.msg { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+.msg h3 { font-family: Inter, sans-serif; font-weight: 700; font-size: 17px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.msg .when { font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--coral-d); text-transform: uppercase; }
+.msg pre { white-space: pre-wrap; font-family: inherit; margin: 10px 0 0; color: var(--ink2); }
+.tip { background: #EAF3EF; border-left: 5px solid var(--sage); padding: 12px 16px; border-radius: 12px; color: var(--ink2); margin: 0 0 18px; }
+.empty { background: #FFF4EF; border: 1px dashed var(--coral); padding: 14px 16px; border-radius: 12px; }
+/* Welcome book */
+.book { background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.book section { padding: 28px clamp(18px, 4vw, 40px); border-bottom: 1px solid var(--line); }
+.book .cover { background: var(--ink); color: #fff; text-align: center; padding: 56px 24px; }
+.book .cover h1 { font-size: clamp(34px, 6vw, 52px); }
+.book .cover p { opacity: .9; max-width: 52ch; margin: 14px auto 0; }
+.book h2 { font-size: 28px; margin-bottom: 10px; color: var(--ink); }
+.book dl { display: grid; grid-template-columns: 170px 1fr; gap: 8px 16px; margin: 0; }
+.book dt { font-weight: 700; }
+.book dd { margin: 0; }
+.book ul { margin: 6px 0 0; padding-left: 20px; }
+.wifi { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+.qr svg, .qr img { width: 170px; height: 170px; }
+/* Signs */
+.signs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.sign { background: #fff; border: 2px solid var(--ink); border-radius: 18px; padding: 26px 22px; text-align: center; min-height: 320px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.sign .ic { font-size: 44px; }
+.sign h2 { font-size: 34px; }
+.sign p { margin: 0; color: var(--ink2); }
+.sign ol { text-align: left; margin: 0 auto; padding-left: 22px; }
+/* Checklist */
+.room { margin-bottom: 16px; }
+.room h3 { font-size: 24px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.room h3 small { font-family: Inter, sans-serif; font-size: 14px; color: var(--muted); }
+.task { display: flex; gap: 12px; align-items: flex-start; padding: 10px 6px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.task input { width: 24px; height: 24px; margin-top: 2px; accent-color: var(--sage-d); flex: none; }
+.task.done span { text-decoration: line-through; color: var(--muted); }
+.bar { height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; margin: 8px 0 18px; }
+.bar i { display: block; height: 100%; background: var(--sage-d); width: 0; transition: width .3s; }
+.calc .out { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 18px; }
+.calc .out div { background: var(--sand); border-radius: 14px; padding: 14px 16px; }
+.calc .out b { display: block; font-family: "DM Serif Display", serif; font-size: 30px; font-weight: 400; }
+.calc .out .good b { color: var(--sage-d); }
+.calc .out .bad b { color: var(--coral-d); }
+.titles li { margin: 8px 0; }
+.toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 999px; font-weight: 600; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 30; }
+.toast.on { opacity: 1; }
+.menuBtn { display: none; }
+@media (max-width: 820px) {
+  .layout { grid-template-columns: 1fr; }
+  nav.side { display: none; border-right: 0; border-bottom: 1px solid var(--line); }
+  nav.side.open { display: block; }
+  .menuBtn { display: inline-flex; background: #2C3B50; color: #fff; border: 1px solid #44566F; border-radius: 10px; padding: 8px 12px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .book dl { grid-template-columns: 1fr; }
+  .book dt { margin-top: 6px; }
+}
+@media print {
+  body { background: #fff; font-size: 13pt; }
+  .top, nav.side, .noprint, .toast { display: none !important; }
+  .layout { display: block; }
+  main { padding: 0; max-width: none; }
+  .view { display: none !important; }
+  .view.on { display: block !important; }
+  .card, .book, .msg { box-shadow: none; border: 0; }
+  .book section { page-break-after: always; border: 0; }
+  .book .cover { background: #fff; color: var(--ink); border-bottom: 3px solid var(--ink); }
+  .signs { display: block; }
+  .sign { page-break-after: always; min-height: 90vh; border-width: 4px; }
+  .sign h2 { font-size: 54pt; }
+  .sign p, .sign li { font-size: 20pt; }
+  .sign .ic { font-size: 72pt; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="menuBtn" id="menuBtn" type="button">Menu</button>
+  <div class="brand"><i>H</i>HostReady</div>
+  <div class="prop">
+    <select id="propSel" aria-label="Choose a property"></select>
+    <button type="button" id="newProp">+ Property</button>
+  </div>
+</header>
+<div class="layout">
+  <nav class="side" id="side">
+    <p>SET UP</p>
+    <button data-v="place" class="on"><span class="n">1</span>Your place</button>
+    <p>WRITTEN FOR YOU</p>
+    <button data-v="book"><span class="n">2</span>Welcome book</button>
+    <button data-v="signs"><span class="n">3</span>House signs</button>
+    <button data-v="messages"><span class="n">4</span>Guest messages</button>
+    <p>BONUSES</p>
+    <button data-v="turnover"><span class="n">★</span>Turnover checklist</button>
+    <button data-v="replies"><span class="n">★</span>Tricky guest replies</button>
+    <button data-v="listing"><span class="n">★</span>Listing booster</button>
+    <button data-v="profit"><span class="n">★</span>Profit calculator</button>
+  </nav>
+  <main>
+    <!-- 1 YOUR PLACE -->
+    <section class="view on" id="v-place">
+      <h1>Your place</h1>
+      <p class="lead">Fill this in once. Everything else in HostReady (your welcome book, house signs and guest messages) is written from it. It saves on this device as you type.</p>
+      <div class="row noprint"><button class="btn ghost small" type="button" id="example">Fill with an example</button><span class="saved" id="savedNote"></span></div>
+      <form class="card" id="placeForm" autocomplete="off">
+        <fieldset><legend>The basics</legend><div class="grid2">
+          <div><label for="f-name">Property name</label><input type="text" id="f-name" data-k="name" placeholder="The Lake House"></div>
+          <div><label for="f-host">Your first name</label><input type="text" id="f-host" data-k="host" placeholder="Sam"></div>
+          <div><label for="f-city">Town or neighborhood</label><input type="text" id="f-city" data-k="city" placeholder="Asheville"></div>
+          <div><label for="f-type">Type of place</label><select id="f-type" data-k="type"><option>home</option><option>cabin</option><option>apartment</option><option>cottage</option><option>condo</option><option>guest suite</option><option>tiny home</option><option>beach house</option></select></div>
+          <div><label for="f-guests">Max guests</label><input type="number" id="f-guests" data-k="guests" min="1" placeholder="6"></div>
+          <div><label for="f-hostphone">Your phone or best contact</label><input type="tel" id="f-hostphone" data-k="hostPhone" placeholder="(555) 123 4567"></div>
+        </div></fieldset>
+        <fieldset><legend>Arrival and departure</legend><div class="grid2">
+          <div><label for="f-in">Check in time</label><input type="text" id="f-in" data-k="checkin" placeholder="4:00 PM"></div>
+          <div><label for="f-out">Check out time</label><input type="text" id="f-out" data-k="checkout" placeholder="11:00 AM"></div>
+          <div><label for="f-entry">How guests get in</label><select id="f-entry" data-k="entry"><option value="keypad">Keypad lock</option><option value="lockbox">Lockbox</option><option value="smartlock">Smart lock (code sent before arrival)</option><option value="inperson">I meet them in person</option></select></div>
+          <div><label for="f-code">Door or lockbox code <small>(optional)</small></label><input type="text" id="f-code" data-k="code" placeholder="Sent the day of arrival"></div>
+          <div class="full"><label for="f-entrynotes">Entry tips <small>(where the door is, lights, stairs)</small></label><textarea id="f-entrynotes" data-k="entryNotes" placeholder="Use the side door by the blue planter. The porch light is on a timer."></textarea></div>
+          <div class="full"><label for="f-parking">Parking</label><textarea id="f-parking" data-k="parking" placeholder="Two cars fit in the driveway. Please do not park on the grass."></textarea></div>
+          <div class="full"><label>Before you leave, please… <small>(tick what you ask)</small></label><div class="checks" id="outChecks"></div></div>
+        </div></fieldset>
+        <fieldset><legend>WiFi</legend><div class="grid2">
+          <div><label for="f-wn">Network name</label><input type="text" id="f-wn" data-k="wifiName" placeholder="LakeHouseGuest"></div>
+          <div><label for="f-wp">Password</label><input type="text" id="f-wp" data-k="wifiPass" placeholder="sunset2026"></div>
+        </div></fieldset>
+        <fieldset><legend>House rules</legend><div class="grid2">
+          <div><label for="f-quiet">Quiet hours</label><input type="text" id="f-quiet" data-k="quiet" placeholder="10 PM to 7 AM"></div>
+          <div><label for="f-pets">Pets</label><select id="f-pets" data-k="pets"><option value="no">No pets, please</option><option value="yes">Pets welcome</option><option value="ask">Ask me first</option></select></div>
+          <div class="full"><label for="f-rules">Anything else? <small>(one per line)</small></label><textarea id="f-rules" data-k="rules" placeholder="Shoes off inside, please&#10;No fireworks"></textarea></div>
+        </div></fieldset>
+        <fieldset><legend>Around the house</legend><div class="grid2">
+          <div class="full"><label for="f-thermo">Heating and cooling</label><textarea id="f-thermo" data-k="thermostat" placeholder="The thermostat is in the hallway. Please keep it between 68 and 74."></textarea></div>
+          <div class="full"><label for="f-coffee">Coffee and kitchen</label><textarea id="f-coffee" data-k="coffee" placeholder="Keurig with pods in the top drawer. Dishwasher tabs under the sink."></textarea></div>
+          <div class="full"><label for="f-trash">Trash and recycling</label><textarea id="f-trash" data-k="trash" placeholder="Bins are beside the garage. Trash day is Tuesday."></textarea></div>
+          <div class="full"><label for="f-other">Other things guests ask about <small>(TV, hot tub, fireplace, washer)</small></label><textarea id="f-other" data-k="other" placeholder="Smart TV: use the Netflix button. Hot tub cover clips on both sides."></textarea></div>
+        </div></fieldset>
+        <fieldset><legend>Your local favorites</legend><div class="grid2">
+          <div class="full"><label for="f-food">Places to eat <small>(one per line)</small></label><textarea id="f-food" data-k="food" placeholder="Rosie's Diner: the best pancakes in town&#10;Luca's: wood fired pizza, 5 minutes away"></textarea></div>
+          <div class="full"><label for="f-cafe">Coffee and treats</label><textarea id="f-cafe" data-k="cafe" placeholder="Bean There: opens at 6 AM"></textarea></div>
+          <div class="full"><label for="f-do">Things to do</label><textarea id="f-do" data-k="todo" placeholder="Sunset walk on the lake trail&#10;Saturday farmers market"></textarea></div>
+          <div><label for="f-groc">Nearest grocery store</label><input type="text" id="f-groc" data-k="grocery" placeholder="Ingles on Main St, 4 minutes"></div>
+          <div><label for="f-hosp">Nearest hospital or urgent care</label><input type="text" id="f-hosp" data-k="hospital" placeholder="Mission Hospital, 12 minutes"></div>
+        </div></fieldset>
+      </form>
+      <div class="row noprint"><button class="btn" type="button" data-go="book">See my welcome book</button></div>
+    </section>
+
+    <!-- 2 WELCOME BOOK -->
+    <section class="view" id="v-book">
+      <h1>Your welcome book</h1>
+      <p class="lead">Written from your details. Print it and leave it on the table, or save it as a PDF and send it to guests before they arrive.</p>
+      <div class="row noprint"><button class="btn" type="button" onclick="window.print()">Print or save as PDF</button><button class="btn ghost small" type="button" data-go="place">Edit details</button></div>
+      <div id="bookOut"></div>
+    </section>
+
+    <!-- 3 SIGNS -->
+    <section class="view" id="v-signs">
+      <h1>House signs</h1>
+      <p class="lead">Twelve signs filled in with your details. Each one prints on its own page. The WiFi sign has a QR code: guests point their camera at it and they are connected.</p>
+      <div class="row noprint"><button class="btn" type="button" onclick="window.print()">Print all signs</button></div>
+      <div class="signs" id="signsOut"></div>
+    </section>
+
+    <!-- 4 MESSAGES -->
+    <section class="view" id="v-messages">
+      <h1>Guest messages</h1>
+      <p class="lead">Every message from booking to review, written with your details. Type the guest's name once, then copy and paste each message into Airbnb, VRBO or Booking.com.</p>
+      <div class="card noprint" style="margin-bottom:16px"><label for="g-name">Guest's first name</label><input type="text" id="g-name" placeholder="Jordan"></div>
+      <div id="msgOut"></div>
+    </section>
+
+    <!-- BONUS TURNOVER -->
+    <section class="view" id="v-turnover">
+      <h1>Turnover checklist</h1>
+      <p class="lead">Tick it off room by room between guests, on your phone or your cleaner's. It remembers where you are. Reset it for the next turnover.</p>
+      <div class="row noprint"><button class="btn ghost small" type="button" id="resetTurn">Start a new turnover</button><button class="btn ghost small" type="button" onclick="window.print()">Print checklist</button></div>
+      <div class="bar"><i id="turnBar"></i></div>
+      <div id="turnOut"></div>
+    </section>
+
+    <!-- BONUS REPLIES -->
+    <section class="view" id="v-replies">
+      <h1>Tricky guest replies</h1>
+      <p class="lead">Calm, polite replies for the messages that make hosts freeze: early check in, noise complaints, refund requests and reviews. Copy, tweak a word, send.</p>
+      <div class="card noprint" style="margin-bottom:16px"><label for="r-name">Guest's first name</label><input type="text" id="r-name" placeholder="Jordan"></div>
+      <div id="repOut"></div>
+    </section>
+
+    <!-- BONUS LISTING -->
+    <section class="view" id="v-listing">
+      <h1>Listing booster</h1>
+      <p class="lead">Answer four questions and get title options and a listing description built from your details.</p>
+      <div class="card"><div class="grid2">
+        <div><label for="l-feat">Best feature</label><input type="text" id="l-feat" placeholder="hot tub with mountain views"></div>
+        <div><label for="l-loc">Location hook</label><input type="text" id="l-loc" placeholder="5 minutes to downtown"></div>
+        <div><label for="l-vibe">The feeling</label><select id="l-vibe"><option>cozy</option><option>bright</option><option>quiet</option><option>modern</option><option>rustic</option><option>family friendly</option><option>romantic</option></select></div>
+        <div><label for="l-beds">Bedrooms</label><input type="number" id="l-beds" min="0" placeholder="3"></div>
+      </div></div>
+      <h2 style="margin:22px 0 8px">Title ideas</h2>
+      <ol class="titles" id="titlesOut"></ol>
+      <h2 style="margin:22px 0 8px">Description</h2>
+      <div class="msg"><h3><span>Your listing description</span><button class="btn small" type="button" data-copy="descOut">Copy</button></h3><pre id="descOut"></pre></div>
+    </section>
+
+    <!-- BONUS PROFIT -->
+    <section class="view" id="v-profit">
+      <h1>Profit calculator</h1>
+      <p class="lead">See what a month really leaves you after fees, cleaning and bills, and how many nights you need to break even.</p>
+      <div class="card calc"><div class="grid2">
+        <div><label for="c-rate">Nightly rate ($)</label><input type="number" id="c-rate" value="150"></div>
+        <div><label for="c-nights">Nights booked per month</label><input type="number" id="c-nights" value="18"></div>
+        <div><label for="c-stays">Stays per month</label><input type="number" id="c-stays" value="7"></div>
+        <div><label for="c-cfee">Cleaning fee charged per stay ($)</label><input type="number" id="c-cfee" value="85"></div>
+        <div><label for="c-ccost">Cleaning cost per stay ($)</label><input type="number" id="c-ccost" value="70"></div>
+        <div><label for="c-pct">Platform fee (%)</label><input type="number" id="c-pct" value="3"></div>
+        <div><label for="c-fixed">Monthly bills ($) <small>(rent or mortgage, utilities, internet)</small></label><input type="number" id="c-fixed" value="1600"></div>
+        <div><label for="c-supply">Supplies per stay ($)</label><input type="number" id="c-supply" value="12"></div>
+      </div>
+      <div class="out" id="calcOut"></div></div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast">Copied</div>
+
+<script>
+(() => {
+  const STORE = "hostready.v1";
+  const OUT_TASKS = ["Start the dishwasher", "Take the trash out", "Leave used towels in the tub", "Turn off lights and AC", "Lock the door and return keys", "Strip the beds"];
+  const load = () => { try { return JSON.parse(localStorage.getItem(STORE)) || null; } catch (e) { return null; } };
+  const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+  let state = load() || { current: 0, props: [{ name: "", entry: "keypad", pets: "no", type: "home", out: [0, 1, 2, 4] }], turn: {} };
+  const P = () => state.props[state.current];
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lines = (s) => String(s || "").split("\n").map((x) => x.trim()).filter(Boolean);
+  const v = (k, fallback) => { const x = (P()[k] || "").toString().trim(); return x || fallback; };
+
+  // ---------- navigation ----------
+  function show(view) {
+    document.querySelectorAll(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + view));
+    document.querySelectorAll("nav.side button").forEach((b) => b.classList.toggle("on", b.dataset.v === view));
+    $("side").classList.remove("open");
+    render();
+    window.scrollTo(0, 0);
+    try { localStorage.setItem(STORE + ".view", view); } catch (e) {}
+  }
+  document.querySelectorAll("nav.side button").forEach((b) => b.addEventListener("click", () => show(b.dataset.v)));
+  document.addEventListener("click", (e) => { const g = e.target.closest("[data-go]"); if (g) show(g.dataset.go); });
+  $("menuBtn").addEventListener("click", () => $("side").classList.toggle("open"));
+
+  // ---------- properties ----------
+  function fillPropSel() {
+    $("propSel").innerHTML = state.props.map((p, i) => `<option value="${i}">${esc(p.name || "My property " + (i + 1))}</option>`).join("");
+    $("propSel").value = state.current;
+  }
+  $("propSel").addEventListener("change", (e) => { state.current = +e.target.value; save(); loadForm(); render(); });
+  $("newProp").addEventListener("click", () => { state.props.push({ name: "", entry: "keypad", pets: "no", type: "home", out: [0, 1, 2, 4] }); state.current = state.props.length - 1; save(); fillPropSel(); loadForm(); show("place"); });
+
+  // ---------- form ----------
+  $("outChecks").innerHTML = OUT_TASKS.map((t, i) => `<label><input type="checkbox" data-out="${i}">${t}</label>`).join("");
+  function loadForm() {
+    document.querySelectorAll("#placeForm [data-k]").forEach((el) => { el.value = P()[el.dataset.k] || (el.tagName === "SELECT" ? el.options[0].value : ""); });
+    document.querySelectorAll("#placeForm [data-out]").forEach((el) => { el.checked = (P().out || []).includes(+el.dataset.out); });
+  }
+  let t;
+  $("placeForm").addEventListener("input", (e) => {
+    const el = e.target;
+    if (el.dataset.k) P()[el.dataset.k] = el.value;
+    if (el.dataset.out !== undefined) P().out = [...document.querySelectorAll("#placeForm [data-out]")].filter((c) => c.checked).map((c) => +c.dataset.out);
+    save(); fillPropSel();
+    $("savedNote").textContent = "Saved";
+    clearTimeout(t); t = setTimeout(() => ($("savedNote").textContent = ""), 1500);
+  });
+  $("example").addEventListener("click", () => {
+    Object.assign(P(), { name: "The Lake House", host: "Sam", city: "Lake Lure", type: "cabin", guests: "6", hostPhone: "(555) 123 4567", checkin: "4:00 PM", checkout: "11:00 AM", entry: "keypad", code: "4821", entryNotes: "Use the side door by the blue planter. The porch light comes on by itself after sunset.", parking: "Two cars fit in the gravel driveway. Please do not park on the grass.", out: [0, 1, 2, 3, 4], wifiName: "LakeHouseGuest", wifiPass: "sunset2026", quiet: "10 PM to 7 AM", pets: "no", rules: "Shoes off inside, please\nNo fireworks\nThe dock is for guests only", thermostat: "The thermostat is in the hallway. Please keep it between 68 and 74.", coffee: "Keurig with pods in the top drawer. Dishwasher tabs are under the sink.", trash: "Bins are beside the garage. Trash day is Tuesday morning.", other: "Smart TV: press the Netflix button on the remote.\nFirewood is under the porch steps.", food: "Rosie's Diner: the best pancakes in town\nLuca's: wood fired pizza, 5 minutes away", cafe: "Bean There: opens at 6 AM", todo: "Sunset walk on the lake trail\nSaturday farmers market by the bridge\nKayak rental at the marina", grocery: "Ingles on Main Street, 4 minutes", hospital: "Mission Hospital, 25 minutes" });
+    save(); loadForm(); fillPropSel();
+    $("savedNote").textContent = "Example added. Change anything you like.";
+  });
+
+  // ---------- helpers ----------
+  function entryText() {
+    const code = v("code", "");
+    switch (P().entry) {
+      case "lockbox": return `The key is in the lockbox by the front door.${code ? " The lockbox code is " + code + "." : " I will send you the code on the day you arrive."}`;
+      case "smartlock": return `The door has a smart lock. Your personal code arrives by message on the day you arrive${code ? " (" + code + ")" : ""}.`;
+      case "inperson": return "I will meet you at the door to hand over the keys and show you around.";
+      default: return `The door has a keypad.${code ? " Your code is " + code + "." : " I will send you the code on the day you arrive."} Press the code, then the lock button.`;
+    }
+  }
+  function petsText() { return { no: "No pets, please.", yes: "Pets are welcome. Please keep them off the beds and clean up outside.", ask: "Please ask me before bringing a pet." }[P().pets || "no"]; }
+  function outList() { return (P().out || []).map((i) => OUT_TASKS[i]); }
+  function wifiQR(size) {
+    const n = v("wifiName", ""), p = v("wifiPass", "");
+    if (!n || typeof qrcode === "undefined") return "";
+    const q = qrcode(0, "M");
+    const e = (s) => s.replace(/([\\;,:"])/g, "\\$1");
+    q.addData(`WIFI:T:WPA;S:${e(n)};P:${e(p)};;`); q.make();
+    return q.createSvgTag({ cellSize: size || 5, margin: 2, scalable: true });
+  }
+  function listHTML(s, empty) { const l = lines(s); return l.length ? "<ul>" + l.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>" : `<p>${empty}</p>`; }
+
+  // ---------- welcome book ----------
+  function renderBook() {
+    const name = v("name", "our place"), host = v("host", "your host");
+    if (!P().name) { $("bookOut").innerHTML = `<p class="empty">Add your property name and a few details in <b>Your place</b> first. Or use <b>Fill with an example</b> to see how it looks.</p>`; return; }
+    const outs = outList();
+    $("bookOut").innerHTML = `<div class="book">
+      <section class="cover"><h1>Welcome to ${esc(name)}</h1><p>We are so glad you are here. Everything you need for your stay is in this book. If you can't find something, message ${esc(host)} any time.</p></section>
+      <section><h2>Arriving</h2><dl><dt>Check in</dt><dd>From ${esc(v("checkin", "4:00 PM"))}</dd><dt>Getting in</dt><dd>${esc(entryText())}</dd>${P().entryNotes ? `<dt>Good to know</dt><dd>${esc(P().entryNotes)}</dd>` : ""}${P().parking ? `<dt>Parking</dt><dd>${esc(P().parking)}</dd>` : ""}</dl></section>
+      <section><h2>WiFi</h2><div class="wifi"><div class="qr">${wifiQR(6)}</div><dl><dt>Network</dt><dd>${esc(v("wifiName", "Ask your host"))}</dd><dt>Password</dt><dd>${esc(v("wifiPass", "Ask your host"))}</dd><dt>Quick connect</dt><dd>Point your phone camera at the code and tap to join.</dd></dl></div></section>
+      <section><h2>House rules</h2><ul><li>Quiet hours: ${esc(v("quiet", "10 PM to 7 AM"))}.</li><li>Up to ${esc(v("guests", "the booked number of"))} guests stay overnight.</li><li>${esc(petsText())}</li><li>No smoking or vaping inside.</li><li>No parties or events.</li>${lines(P().rules).map((r) => "<li>" + esc(r) + "</li>").join("")}</ul></section>
+      <section><h2>Around the house</h2><dl>${P().thermostat ? `<dt>Heating and cooling</dt><dd>${esc(P().thermostat)}</dd>` : ""}${P().coffee ? `<dt>Coffee and kitchen</dt><dd>${esc(P().coffee)}</dd>` : ""}${P().trash ? `<dt>Trash and recycling</dt><dd>${esc(P().trash)}</dd>` : ""}${lines(P().other).length ? `<dt>Also handy</dt><dd>${listHTML(P().other, "")}</dd>` : ""}</dl></section>
+      <section><h2>Our local favorites</h2><dl><dt>Places to eat</dt><dd>${listHTML(P().food, "Ask me for my favorites.")}</dd><dt>Coffee and treats</dt><dd>${listHTML(P().cafe, "Ask me for a recommendation.")}</dd><dt>Things to do</dt><dd>${listHTML(P().todo, "Ask me what is on this week.")}</dd>${P().grocery ? `<dt>Groceries</dt><dd>${esc(P().grocery)}</dd>` : ""}</dl></section>
+      <section><h2>In an emergency</h2><dl><dt>Emergency</dt><dd>Call 911</dd><dt>Your host</dt><dd>${esc(host)}${P().hostPhone ? ", " + esc(P().hostPhone) : ", through the booking app"}</dd>${P().hospital ? `<dt>Nearest hospital</dt><dd>${esc(P().hospital)}</dd>` : ""}<dt>Address</dt><dd>Your booking confirmation has the full address.</dd></dl></section>
+      <section><h2>Checking out</h2><p>Check out is by <b>${esc(v("checkout", "11:00 AM"))}</b>. Before you go, please:</p><ul>${(outs.length ? outs : ["Lock the door behind you"]).map((x) => "<li>" + esc(x) + "</li>").join("")}</ul></section>
+      <section><h2>Thank you</h2><p>Thank you for staying at ${esc(name)}. If anything was less than perfect, please tell me first so I can fix it for the next guest. If you loved your stay, a review means the world to a small host like me.</p><p><b>${esc(host)}</b></p></section>
+    </div>`;
+  }
+
+  // ---------- signs ----------
+  function renderSigns() {
+    if (!P().name) { $("signsOut").innerHTML = `<p class="empty">Add your details in <b>Your place</b> first.</p>`; return; }
+    const outs = outList();
+    const S = [
+      ["👋", `Welcome to ${esc(v("name", ""))}`, `<p>Make yourself at home. Your welcome book is on the table.</p><p><b>${esc(v("host", ""))}</b></p>`],
+      ["📶", "WiFi", `<div class="qr">${wifiQR(7)}</div><p>Scan to connect</p><p>Network: <b>${esc(v("wifiName", ""))}</b><br>Password: <b>${esc(v("wifiPass", ""))}</b></p>`],
+      ["🧳", `Check out by ${esc(v("checkout", "11:00 AM"))}`, `<ol>${(outs.length ? outs : ["Lock the door behind you"]).map((x) => "<li>" + esc(x) + "</li>").join("")}</ol>`],
+      ["🌙", "Quiet hours", `<p>${esc(v("quiet", "10 PM to 7 AM"))}</p><p>Our neighbors thank you.</p>`],
+      ["🚭", "No smoking or vaping", `<p>Inside or on the porch. Thank you for keeping the house fresh for the next guests.</p>`],
+      ["🎉", "No parties or events", `<p>Up to ${esc(v("guests", "the booked number of"))} guests stay overnight.</p>`],
+      ["🌡️", "Heating and cooling", `<p>${esc(v("thermostat", "Please keep the thermostat between 68 and 74."))}</p>`],
+      ["☕", "Coffee station", `<p>${esc(v("coffee", "Help yourself to coffee and tea."))}</p>`],
+      ["🗑️", "Trash and recycling", `<p>${esc(v("trash", "Bins are outside. Please bag all trash."))}</p>`],
+      ["🚽", "Please don't flush", `<p>Wipes, paper towels or anything except toilet paper. Our pipes thank you.</p>`],
+      ["🔑", "Locking up", `<p>${esc(entryText())}</p><p>Please lock the door whenever you leave.</p>`],
+      ["🆘", "In an emergency", `<p>Call <b>911</b></p><p>Your host: <b>${esc(v("host", ""))}</b>${P().hostPhone ? "<br>" + esc(P().hostPhone) : ""}</p>${P().hospital ? `<p>Hospital: ${esc(P().hospital)}</p>` : ""}`],
+    ];
+    $("signsOut").innerHTML = S.map(([ic, h, body]) => `<div class="sign"><div class="ic">${ic}</div><h2>${h}</h2>${body}</div>`).join("");
+  }
+
+  // ---------- messages ----------
+  function msgList(guest) {
+    const g = guest || "there", name = v("name", "our place"), host = v("host", "your host"), city = v("city", "the area");
+    const outs = outList();
+    return [
+      ["Right after booking", "Thank you for booking", `Hi ${g}! Thank you for booking ${name}. I'm ${host}, and I'll be your host. You're all set for your stay. A few days before you arrive I'll send everything you need: directions, check in steps and the WiFi. If you have any questions before then, just message me here. We're excited to have you!`],
+      ["3 days before arrival", "Your trip is almost here", `Hi ${g}, your stay at ${name} is coming up! Here is what to know:\n\nCheck in: from ${v("checkin", "4:00 PM")}\nGetting in: ${entryText()}\n${P().parking ? "Parking: " + P().parking + "\n" : ""}${P().entryNotes ? "Good to know: " + P().entryNotes + "\n" : ""}\nIs there anything that would make your stay better? A crib, extra towels, a late arrival? Let me know and I'll do my best.`],
+      ["Morning of arrival", "Today's the day", `Good morning ${g}! Your place is ready for you from ${v("checkin", "4:00 PM")}. ${entryText()}\n\nWiFi: ${v("wifiName", "see the welcome book")} / ${v("wifiPass", "")}\n\nThe welcome book on the table has everything else. Safe travels!`],
+      ["Evening of arrival", "Did you settle in?", `Hi ${g}, I hope you found everything easily! Is everything working and comfortable? If anything is missing or not quite right, message me now so I can fix it tonight.`],
+      ["Second morning", "Local tip", `Good morning ${g}! If you're looking for something to do today in ${city}, our favorite is ${lines(P().todo)[0] || "in the welcome book"}. For breakfast, try ${lines(P().food)[0] || lines(P().cafe)[0] || "one of the places in the welcome book"}. Enjoy your day!`],
+      ["Evening before check out", "Check out tomorrow", `Hi ${g}, I hope you've had a wonderful stay! Just a reminder that check out is tomorrow by ${v("checkout", "11:00 AM")}. Before you go, please:\n${(outs.length ? outs : ["Lock the door behind you"]).map((x) => "• " + x).join("\n")}\n\nNo need to clean beyond that. Need a later check out? Ask me and I'll check if it's possible.`],
+      ["Morning of check out", "Thank you", `Good morning ${g}! Thank you so much for staying at ${name}. Have a safe trip home. If anything was less than perfect, please tell me directly so I can make it right for the next guests.`],
+      ["Day after check out", "A small favor", `Hi ${g}, thank you again for being such great guests. If you enjoyed your stay, would you leave a short review? It takes a minute and it truly helps a small host like me. I've left you a 5 star review as well. Hope to host you again!`],
+      ["After a 5 star review", "Thank you for the review", `${g}, thank you for the lovely review! It made our day. You're welcome back any time, and if you book directly next time, just message me first.`],
+      ["Inviting them back", "Come back soon", `Hi ${g}! It's ${host} from ${name}. ${city} is lovely this time of year and we have some open dates coming up. Since you've stayed with us before, we'd love to host you again. Want me to check dates for you?`],
+    ];
+  }
+  function renderMessages() {
+    const g = $("g-name").value.trim();
+    $("msgOut").innerHTML = (P().name ? "" : `<p class="empty">Tip: add your details in <b>Your place</b> so these messages fill in your WiFi, times and favorites.</p>`) +
+      msgList(g).map(([when, title, text], i) => `<div class="msg"><span class="when">${esc(when)}</span><h3><span>${esc(title)}</span><button class="btn small noprint" type="button" data-copy="m${i}">Copy</button></h3><pre id="m${i}">${esc(text)}</pre></div>`).join("");
+  }
+  $("g-name").addEventListener("input", renderMessages);
+
+  // ---------- turnover ----------
+  const ROOMS = {
+    "Arrival walk through": ["Open windows to air the place", "Check for damage or missing items, take photos if needed", "Collect anything left behind and log it", "Start the first load of laundry"],
+    "Kitchen": ["Empty and run the dishwasher, put dishes away", "Wipe counters, stovetop and backsplash", "Clean inside the microwave", "Empty the fridge of guest food, wipe shelves", "Wipe cabinet fronts and handles", "Refill coffee, tea, sugar and filters", "Empty trash and recycling, new bags", "Mop the floor"],
+    "Bathrooms": ["Clean and disinfect toilet, inside and out", "Scrub shower, tub and glass", "Clean sink, faucet and mirror", "Fresh towels, folded the same way every time", "Restock toilet paper (2 spare rolls)", "Refill soap, shampoo and conditioner", "Empty trash, new bag", "Mop the floor"],
+    "Bedrooms": ["Strip beds and check mattress protectors", "Make beds with fresh linens", "Dust nightstands and lamps", "Check under beds and in drawers", "Hangers in closets (at least 8)", "Vacuum"],
+    "Living areas": ["Dust surfaces and TV", "Wipe remote controls and light switches", "Fluff and straighten cushions and throws", "Reset furniture to the photo layout", "Vacuum and mop"],
+    "Outside": ["Sweep porch and entry", "Wipe outdoor table and chairs", "Check the grill and hot tub", "Bins out on trash day"],
+    "Final check": ["Welcome book on the table", "Thermostat set for arrival", "All lights working", "WiFi working", "Doors locked, new code set if needed", "Photo of each room for your records"],
+    "Restock list": ["Toilet paper", "Paper towels", "Dish soap and sponge", "Dishwasher tabs", "Laundry detergent", "Trash bags", "Coffee and filters", "Hand soap", "Shampoo and body wash", "Spare light bulbs and batteries"],
+  };
+  function renderTurn() {
+    const key = state.current, done = state.turn[key] || {};
+    let total = 0, count = 0;
+    $("turnOut").innerHTML = Object.entries(ROOMS).map(([room, tasks]) => {
+      const items = tasks.map((task, i) => { const id = room + "|" + i; total++; if (done[id]) count++; return `<label class="task ${done[id] ? "done" : ""}"><input type="checkbox" data-t="${esc(id)}" ${done[id] ? "checked" : ""}><span>${esc(task)}</span></label>`; }).join("");
+      const roomDone = tasks.filter((_, i) => done[room + "|" + i]).length;
+      return `<div class="card room"><h3>${esc(room)} <small>${roomDone} of ${tasks.length}</small></h3>${items}</div>`;
+    }).join("");
+    $("turnBar").style.width = (total ? (count / total) * 100 : 0) + "%";
+  }
+  $("turnOut").addEventListener("change", (e) => { const id = e.target.dataset.t; if (!id) return; const k = state.current; state.turn[k] = state.turn[k] || {}; state.turn[k][id] = e.target.checked; save(); renderTurn(); });
+  $("resetTurn").addEventListener("click", () => { state.turn[state.current] = {}; save(); renderTurn(); toast("Ready for the next turnover"); });
+
+  // ---------- tricky replies ----------
+  function repList(guest) {
+    const g = guest || "there", host = v("host", "your host"), cin = v("checkin", "4:00 PM"), cout = v("checkout", "11:00 AM"), name = v("name", "the place");
+    return [
+      ["Early check in request", `Hi ${g}, thanks for asking! Our cleaners need the morning to get everything ready, so check in is from ${cin}. If the house is ready earlier on the day, I'll message you right away. You're welcome to leave bags by the door if that helps.`],
+      ["Late check out request", `Hi ${g}, I'd love to help. Let me check whether anyone arrives the same day. If not, a check out of 1 PM is fine at no charge. I'll confirm the evening before.`],
+      ["They can't get in", `Hi ${g}, so sorry for the trouble! Let's fix this now. ${entryText()} If it still doesn't work, call me at ${v("hostPhone", "the number in your booking")} and I'll stay on the line until you're inside.`],
+      ["WiFi isn't working", `Hi ${g}, sorry about that! Please unplug the router for 30 seconds and plug it back in, then wait two minutes. The network is ${v("wifiName", "listed in the welcome book")}. If it's still down, let me know and I'll contact the provider right away.`],
+      ["Something is broken", `Hi ${g}, thank you for telling me, and I'm sorry it happened during your stay. Could you send a photo? I'll arrange a fix or a replacement as quickly as I can and keep you updated.`],
+      ["Something is missing", `Hi ${g}, thanks for letting me know! I'll bring a replacement or have it delivered today. In the meantime, check the hall closet, where I keep spares.`],
+      ["Neighbor noise complaint", `Hi ${g}, I hope you're having a great time! A neighbor mentioned some noise tonight. Our quiet hours are ${v("quiet", "10 PM to 7 AM")}, so could you keep it down from now on? Thank you so much for understanding.`],
+      ["Extra guests showed up", `Hi ${g}, I noticed there may be more people at the house than on the booking. For insurance reasons, only booked guests can stay overnight. Could you update the reservation or let me know by this evening? Thank you!`],
+      ["Unexpected pet", `Hi ${g}, it looks like a pet may be staying with you. ${petsText()} Please message me today so we can sort out the right option together.`],
+      ["Refund request for a small issue", `Hi ${g}, I'm sorry the stay wasn't perfect. I've noted the issue so it's fixed for the next guests. As a thank you for telling me, I'd like to offer 10% off your next stay. I hope you'll give us another chance.`],
+      ["Refund request outside the policy", `Hi ${g}, I understand plans change, and I'm sorry this has been stressful. Refunds follow the cancellation policy on the listing, which I can't change on my side. If your dates move, I'll gladly help you rebook.`],
+      ["Asking to pay off the platform", `Hi ${g}, thanks for thinking of us! For your protection and mine, all bookings go through the platform. If you'd like to come back, message me and I'll help you find dates.`],
+      ["Guest left something behind", `Hi ${g}, you left something behind at ${name}! I've put it somewhere safe. If you send me your address and a prepaid label, I'll post it this week.`],
+      ["Thanks for a 5 star review", `Thank you, ${g}! Hosting you was a pleasure, and we'd love to welcome you back any time.`],
+      ["Public reply to a 4 star review", `Thank you for staying with us, ${g}, and for the kind words. I've taken your note on board and already made a change so the next stay is even better. We hope to see you again.`],
+      ["Public reply to a 1 or 2 star review", `Thank you for your feedback. I'm sorry the stay didn't meet your expectations. [Say in one line what you did or offered, for example: we answered within the hour and offered a fix.] We take every comment seriously and have reviewed our checklist. Future guests can expect the same clean, well cared for home our other reviews describe.`],
+      ["Asking for a review", `Hi ${g}, thanks again for staying at ${name}! If you have a minute, a short review would mean a lot to a small host like me. Thank you!`],
+      ["Booking inquiry: is it available?", `Hi ${g}, thanks for your interest in ${name}! Those dates are open. It sleeps ${v("guests", "the listed number of")} guests and check in is from ${cin}. Book whenever you're ready, and message me with any questions.`],
+      ["Booking inquiry: can you discount?", `Hi ${g}, thanks for asking! Our prices already include everything you see on the listing. For stays of 7 nights or more, I can offer a weekly discount. Would that work for you?`],
+      ["Late night arrival", `Hi ${g}, no problem arriving late! ${entryText()} The porch light will be on. Message me when you're inside so I know you arrived safely.`],
+    ];
+  }
+  function renderReplies() {
+    const g = $("r-name").value.trim();
+    $("repOut").innerHTML = repList(g).map(([title, text], i) => `<div class="msg"><h3><span>${esc(title)}</span><button class="btn small noprint" type="button" data-copy="r${i}">Copy</button></h3><pre id="r${i}">${esc(text)}</pre></div>`).join("");
+  }
+  $("r-name").addEventListener("input", renderReplies);
+
+  // ---------- listing booster ----------
+  function renderListing() {
+    const feat = $("l-feat").value.trim() || "hot tub", loc = $("l-loc").value.trim() || ("close to everything in " + v("city", "town")), vibe = $("l-vibe").value, beds = $("l-beds").value || "", type = v("type", "home");
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const titles = [
+      `${cap(vibe)} ${type} with ${feat}`,
+      `${cap(feat)} | ${cap(loc)}`,
+      `${beds ? beds + " bedroom " : ""}${type}, ${feat}, ${loc}`,
+      `Escape to a ${vibe} ${type}: ${feat}`,
+      `${cap(v("city", "Local"))} ${type} · ${feat} · sleeps ${v("guests", "6")}`,
+    ].map((x) => cap(x.replace(/\s+/g, " ").trim()));
+    $("titlesOut").innerHTML = titles.map((x) => `<li>${esc(x)} <small style="color:var(--muted)">(${x.length} characters${x.length > 50 ? ", trim to fit 50" : ""})</small></li>`).join("");
+    const food = lines(P().food)[0], todo = lines(P().todo)[0];
+    $("descOut").textContent = `Welcome to ${v("name", "our " + type)}, a ${vibe} ${beds ? beds + " bedroom " : ""}${type} in ${v("city", "town")} with ${feat}, ${loc}.\n\nThe space\nSleeps up to ${v("guests", "6")} guests. ${P().coffee ? "The kitchen is ready for real cooking, and the coffee is on us. " : ""}Fast WiFi throughout.\n\nGetting in\n${entryText()} Check in from ${v("checkin", "4:00 PM")}, check out by ${v("checkout", "11:00 AM")}.\n\nThe neighborhood\n${todo ? cap(todo) + ". " : ""}${food ? "For dinner, guests love " + food + ". " : ""}${P().grocery ? "Groceries: " + P().grocery + "." : ""}\n\nGood to know\nQuiet hours ${v("quiet", "10 PM to 7 AM")}. ${petsText()} No smoking and no parties.\n\nI'm ${v("host", "your host")}, and I answer messages fast. A printed welcome book is waiting for you inside.`;
+  }
+  ["l-feat", "l-loc", "l-vibe", "l-beds"].forEach((id) => $(id).addEventListener("input", renderListing));
+
+  // ---------- profit ----------
+  function renderProfit() {
+    const n = (id) => +$(id).value || 0;
+    const rate = n("c-rate"), nights = n("c-nights"), stays = n("c-stays"), cfee = n("c-cfee"), ccost = n("c-ccost"), pct = n("c-pct") / 100, fixed = n("c-fixed"), supply = n("c-supply");
+    const revenue = rate * nights + cfee * stays;
+    const fees = revenue * pct;
+    const variable = (ccost + supply) * stays;
+    const profit = revenue - fees - variable - fixed;
+    const perNight = rate * (1 - pct) - (stays && nights ? ((ccost + supply - cfee * (1 - pct)) * stays) / nights : 0);
+    const breakEven = perNight > 0 ? Math.ceil(fixed / perNight) : null;
+    const usd = (x) => (x < 0 ? "-$" : "$") + Math.abs(Math.round(x)).toLocaleString("en-US");
+    $("calcOut").innerHTML = `<div><span>Money in</span><b>${usd(revenue)}</b></div><div><span>Platform fees</span><b>${usd(fees)}</b></div><div><span>Cleaning and supplies</span><b>${usd(variable)}</b></div><div><span>Monthly bills</span><b>${usd(fixed)}</b></div><div class="${profit >= 0 ? "good" : "bad"}"><span>What you keep</span><b>${usd(profit)}</b></div><div><span>Nights to break even</span><b>${breakEven === null ? "n/a" : breakEven}</b></div>`;
+  }
+  document.querySelectorAll(".calc input").forEach((el) => el.addEventListener("input", renderProfit));
+
+  // ---------- copy + toast ----------
+  function toast(text) { const t = $("toast"); t.textContent = text; t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 1600); }
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-copy]"); if (!b) return;
+    const text = $(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(text); toast("Copied. Paste it into your guest chat."); }
+    catch (err) { const r = document.createRange(); r.selectNodeContents($(b.dataset.copy)); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Selected. Press copy on your keyboard."); }
+  });
+
+  function render() {
+    const on = document.querySelector(".view.on").id.slice(2);
+    if (on === "book") renderBook();
+    if (on === "signs") renderSigns();
+    if (on === "messages") renderMessages();
+    if (on === "turnover") renderTurn();
+    if (on === "replies") renderReplies();
+    if (on === "listing") renderListing();
+    if (on === "profit") renderProfit();
+  }
+
+  fillPropSel(); loadForm();
+  let first = "place"; try { first = localStorage.getItem(STORE + ".view") || "place"; } catch (e) {}
+  // #demo-book, #demo-signs... opens the example property on that screen (used for the sales page pictures).
+  const demo = location.hash.match(/^#demo-?(\w*)/);
+  if (demo) { $("example").click(); $("g-name").value = "Jordan"; $("r-name").value = "Jordan"; first = demo[1] || "place"; }
+  show(document.getElementById("v-" + first) ? first : "place");
+})();
+</script>
+</body>
+</html>
