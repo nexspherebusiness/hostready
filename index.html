@@ -106,6 +106,12 @@ footer { padding: 36px 0 120px; color: var(--muted); font-size: 14px; text-align
   .sticky.on { display: flex; }
 }
 </style>
+<link rel="preconnect" href="https://cdn.utmify.com.br">
+<script>
+/* UTMify: the UTM script (passes campaign data to the Hotmart checkout link) and the pixel (the pixel id is public).
+   Same code the UTMify panel gives, without the obfuscation. Skipped on localhost so tests send no events. */
+(function(){if(location.hostname==='localhost'||location.hostname==='127.0.0.1')return;window.pixelId="6ad968d17ec5abb7b0ef87f8";function add(src,attrs){var s=document.createElement('script');s.src=src;s.async=true;s.defer=true;for(var k in attrs)s.setAttribute(k,attrs[k]);document.head.appendChild(s);}add('https://cdn.utmify.com.br/scripts/utms/latest.js',{'data-utmify-prevent-subids':''});add('https://cdn.utmify.com.br/scripts/pixel/pixel.js',{});})();
+</script>
 </head>
 <body>
 <div class="bar">For Airbnb, VRBO and Booking.com hosts · Launch price <b>$9.99</b> · Instant access</div>
